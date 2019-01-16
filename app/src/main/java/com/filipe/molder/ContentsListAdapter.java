@@ -3,8 +3,8 @@ package com.filipe.molder;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +13,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -50,8 +51,10 @@ public class ContentsListAdapter extends RecyclerView.Adapter {
         return mContentsList.size();
     }
 
-    private class ContentsViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    private class ContentsViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener,
+    View.OnLongClickListener {
 
+        private View mItemView;
         private TextView mName;
         private TextView mFooter;
         private ImageView mContentImageView;
@@ -60,15 +63,24 @@ public class ContentsListAdapter extends RecyclerView.Adapter {
         public ContentsViewHolder(View itemView) {
             super(itemView);
 
+            mItemView = itemView;
+
             mName = itemView.findViewById(R.id.name);
             mFooter = itemView.findViewById(R.id.footer);
             mContentImageView = itemView.findViewById(R.id.contentImageView);
 
             itemView.setOnClickListener(this);
+            itemView.setOnLongClickListener(this);
         }
 
         public void bindView(final int position) {
             mContent = mContentsList.get(position);
+
+            if(mContent.isSelected()) {
+                mItemView.setBackgroundColor(Color.LTGRAY);
+            } else {
+                mItemView.setBackgroundColor(Color.TRANSPARENT);
+            }
 
             mThreadPool.submit(new Runnable() {
                 @Override
@@ -133,11 +145,14 @@ public class ContentsListAdapter extends RecyclerView.Adapter {
 
         @Override
         public void onClick(View view) {
-            if (mContent.getFile().isDirectory()) {
-                FileController.moveToDirectory(mContent, true);
-            } else {
-                Log.d("CLA", "Song Clicked");
-            }
+            mContext.contentOnClick(mContent, view);
+        }
+
+        @Override
+        public boolean onLongClick(View view) {
+            mContext.contentOnLongClick(mContent, view);
+
+            return true;
         }
     }
 }

@@ -10,11 +10,18 @@ public class Directory implements Content {
     private File mFile;
     private Content mParentDir;
     private List<Content> mFiles;
+    private boolean mIsSelected;
 
     public Directory(File file, Content parentDir) {
         mFile = file;
         mParentDir = parentDir;
-        mFiles = new ArrayList<Content>();
+        mFiles = new ArrayList<>();
+        mIsSelected = false;
+    }
+
+    @Override
+    public void setIsSelected(boolean isSelected) {
+        mIsSelected = isSelected;
     }
 
     @Override
@@ -46,5 +53,10 @@ public class Directory implements Content {
     public MetaData getMetaData() {
         //This method is to be used by this class
         return null;
+    }
+
+    @Override
+    public boolean isSelected() {
+        return mIsSelected;
     }
 }

@@ -14,9 +14,11 @@ import java.util.List;
 class NavigationBarAdapter extends RecyclerView.Adapter {
 
     private List<File> mDirsList;
+    private MainActivity mContext;
 
-    public NavigationBarAdapter() {
-        mDirsList = new ArrayList<File>();
+    public NavigationBarAdapter(MainActivity context) {
+        mDirsList = new ArrayList<>();
+        mContext = context;
     }
 
     @Override
@@ -67,7 +69,7 @@ class NavigationBarAdapter extends RecyclerView.Adapter {
 
         @Override
         public void onClick(View view) {
-            FileController.moveBackToDir(mDir);
+            mContext.navBarOnClick(mDir);
         }
     }
 }

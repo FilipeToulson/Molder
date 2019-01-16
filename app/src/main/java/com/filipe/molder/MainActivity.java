@@ -9,6 +9,8 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
+import android.view.View;
 
 import java.io.File;
 
@@ -16,6 +18,7 @@ import java.io.File;
 public class MainActivity extends AppCompatActivity {
 
     private static final int PERMISSIONS_ACTIVITY_REQUEST_CODE = 0;
+    private AppState mCurrentState;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
         RecyclerView navigationBar = findViewById(R.id.navigationBar);
         navigationBar.setLayoutManager(new LinearLayoutManager(this,
                 LinearLayoutManager.HORIZONTAL, false));
-        NavigationBarAdapter navigationBarAdapter = new NavigationBarAdapter();
+        NavigationBarAdapter navigationBarAdapter = new NavigationBarAdapter(this);
         navigationBar.setAdapter(navigationBarAdapter);
 
         File root = Environment.getExternalStorageDirectory();
@@ -64,15 +67,32 @@ public class MainActivity extends AppCompatActivity {
         FileController.setContentsListAdapter(contentsListAdapter);
         FileController.setNavBarAdapter(navigationBarAdapter);
         FileController.constructFileTree(root);
+
+        mCurrentState = new BaseState(this);
+    }
+
+    public void contentOnClick(Content content, View view) {
+        mCurrentState.contentOnClick(content, view);
+    }
+
+    public void contentOnLongClick(Content content, View view) {
+        mCurrentState.contentOnLongClick(content, view);
+    }
+
+    public void navBarOnClick(File directory) {
+        mCurrentState.navBarOnClick(directory);
+    }
+
+    public void setState(AppState newAppState) {
+        mCurrentState = newAppState;
     }
 
     @Override
     public void onBackPressed() {
-        if (FileController.atRootDir()) {
-            //Exit the app
-            super.onBackPressed();
-        } else {
-            FileController.moveBackDirOnce();
-        }
+        mCurrentState.onBackPressed();
+    }
+
+    public void exitApp() {
+        super.onBackPressed();
     }
 }

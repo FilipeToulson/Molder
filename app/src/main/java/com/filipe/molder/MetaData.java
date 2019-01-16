@@ -21,22 +21,6 @@ public class MetaData {
 
     }
 
-    public String getSongName() {
-        return mSongName;
-    }
-
-    public String getArtistName() {
-        return mArtistName;
-    }
-
-    public String getAlbumName() {
-        return mAlbumName;
-    }
-
-    public int getAlbumArtId() {
-        return mAlbumArtId;
-    }
-
     public void setSongName(String songName) {
         this.mSongName = songName;
     }
@@ -51,6 +35,22 @@ public class MetaData {
 
     public void setAlbumArtId(int albumArtId) {
         this.mAlbumArtId = albumArtId;
+    }
+
+    public String getSongName() {
+        return mSongName;
+    }
+
+    public String getArtistName() {
+        return mArtistName;
+    }
+
+    public String getAlbumName() {
+        return mAlbumName;
+    }
+
+    public int getAlbumArtId() {
+        return mAlbumArtId;
     }
 
     public String getAlbumArtPath(MainActivity context) {
