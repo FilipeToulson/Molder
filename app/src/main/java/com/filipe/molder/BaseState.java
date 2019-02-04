@@ -1,7 +1,6 @@
 package com.filipe.molder;
 
 
-import android.graphics.Color;
 import android.util.Log;
 import android.view.View;
 
@@ -26,8 +25,7 @@ public class BaseState implements AppState {
 
     @Override
     public void contentOnLongClick(Content content, View view) {
-        content.setIsSelected(true);
-        view.setBackgroundColor(Color.LTGRAY);
+        mContext.showControlsBar(true);
 
         AppState appState = new SelectionState(content, view, mContext);
         mContext.setState(appState);
@@ -36,6 +34,11 @@ public class BaseState implements AppState {
     @Override
     public void navBarOnClick(File directory) {
         FileController.moveBackToDir(directory);
+    }
+
+    @Override
+    public void editButtonOnClick() {
+        //This method is not to be used by this class
     }
 
     @Override

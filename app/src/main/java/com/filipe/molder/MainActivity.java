@@ -3,22 +3,30 @@ package com.filipe.molder;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.constraint.ConstraintLayout;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
+import android.widget.ImageButton;
+import android.widget.TextView;
 
 import java.io.File;
+import java.util.List;
 
 //Takes care of handling the main UI.
 public class MainActivity extends AppCompatActivity {
 
     private static final int PERMISSIONS_ACTIVITY_REQUEST_CODE = 0;
+    private static final int PHOTO_PICKER_ACTIVITY_REQUEST_CODE = 1;
     private AppState mCurrentState;
+    private ConstraintLayout mControlsBar;
+    private int mControlsBarHeight;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,11 +54,24 @@ public class MainActivity extends AppCompatActivity {
                     //Permissions have been granted from PermissionsActivity
                     init();
                 }
+
+                break;
+            } case PHOTO_PICKER_ACTIVITY_REQUEST_CODE: {
+                if (resultCode == RESULT_OK) {
+                    //An image has been picked by the user
+                    Uri newAlbumArtUri = data.getData();
+
+                    EditDialogBuilder.setNewAlbumArtFile(this, newAlbumArtUri);
+                }
             }
         }
     }
 
     private void init() {
+        mControlsBar = findViewById(R.id.controlsBar);
+        mControlsBarHeight = mControlsBar.getMaxHeight();
+        mControlsBar.setMaxHeight(0);
+
         RecyclerView contentsList = findViewById(R.id.contentsList);
         contentsList.setLayoutManager(new LinearLayoutManager(this));
         ContentsListAdapter contentsListAdapter = new ContentsListAdapter(this);
@@ -68,6 +89,8 @@ public class MainActivity extends AppCompatActivity {
         FileController.setNavBarAdapter(navigationBarAdapter);
         FileController.constructFileTree(root);
 
+        MetaDataController.setContext(this);
+
         mCurrentState = new BaseState(this);
     }
 
@@ -81,6 +104,44 @@ public class MainActivity extends AppCompatActivity {
 
     public void navBarOnClick(File directory) {
         mCurrentState.navBarOnClick(directory);
+    }
+
+    public void editButtonOnClick(View view) {
+        mCurrentState.editButtonOnClick();
+    }
+
+    public void albumArtOnClick(View view) {
+        Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
+        photoPickerIntent.setType("image/*");
+        startActivityForResult(photoPickerIntent, PHOTO_PICKER_ACTIVITY_REQUEST_CODE);
+    }
+
+    public void showControlsBar(boolean showControlsBar) {
+        if(showControlsBar) {
+            mControlsBar.setMaxHeight(mControlsBarHeight);
+        } else {
+            mControlsBar.setMaxHeight(0);
+        }
+    }
+
+    public void enableEditButton(boolean enableEditButton) {
+        ImageButton editButton = findViewById(R.id.editButton);
+        TextView editButtonLabel = findViewById(R.id.editButtonLabel);
+
+        editButton.setEnabled(enableEditButton);
+
+        if(enableEditButton) {
+            editButtonLabel.setVisibility(View.VISIBLE);
+        } else {
+            editButtonLabel.setVisibility(View.INVISIBLE);
+        }
+    }
+
+    public void showEditDialog(EditCompleteListener editCompleteListener, List<Content> content,
+                               int dialogCode) {
+        AlertDialog.Builder editDialog = EditDialogBuilder.buildEditDialog(this,
+                editCompleteListener, content, dialogCode);
+        editDialog.show();
     }
 
     public void setState(AppState newAppState) {

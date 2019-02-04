@@ -9,5 +9,6 @@ public interface AppState {
     void contentOnClick(Content content, View view);
     void contentOnLongClick(Content content, View view);
     void navBarOnClick(File directory);
+    void editButtonOnClick();
     void onBackPressed();
 }
