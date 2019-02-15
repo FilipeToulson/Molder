@@ -8,6 +8,7 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.v7.app.AlertDialog;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -137,7 +138,6 @@ public class EditDialogBuilder {
         {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                boolean metaDataChanged = false;
                 String newSongName = songNameEdit.getText().toString();
                 String newArtistName = artistNameEdit.getText().toString();
                 String newAlbumName = albumNameEdit.getText().toString();
@@ -203,30 +203,82 @@ public class EditDialogBuilder {
         return builder;
     }
 
-    private static AlertDialog.Builder buildMultipleSongsEditDialog(MainActivity context,
-                                                          List<Content> content) {
+    private static AlertDialog.Builder buildMultipleSongsEditDialog(final MainActivity context,
+                                                                    final List<Content> content) {
         final View editSongsDialogLayout = context.getLayoutInflater().inflate(
                 R.layout.edit_songs_dialog, null, false);
 
         final EditText artistNameEdit = editSongsDialogLayout.findViewById(R.id.artistNameEdit);
         artistNameEdit.setText("");
 
-        ImageView editAlbumArt = editSongsDialogLayout.findViewById(R.id.albumArt);
-        Glide.with(context).load(R.drawable.placeholder).into(editAlbumArt);
+        final EditText albumNameEdit = editSongsDialogLayout.findViewById(R.id.albumNameEdit);
+        albumNameEdit.setText("");
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        final EditText songGenreEdit = editSongsDialogLayout.findViewById(R.id.songGenreEdit);
+        songGenreEdit.setText("");
+
+        final EditText recordingDateEdit = editSongsDialogLayout.findViewById(R.id.recordingDateEdit);
+        recordingDateEdit.setText("");
+
+        mEditAlbumArt = editSongsDialogLayout.findViewById(R.id.albumArt);
+        Glide.with(context).load(R.drawable.placeholder).into(mEditAlbumArt);
+
+        final AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle("Edit Songs");
         builder.setView(editSongsDialogLayout);
 
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                //TODO: implement changing of metadata for multiple mp3s.
+                String newArtistName = artistNameEdit.getText().toString();
+                String newAlbumName = albumNameEdit.getText().toString();
+                String newSongGenre = songGenreEdit.getText().toString();
+                String newRecordingDate = recordingDateEdit.getText().toString();
+
+                try {
+                    for (Content song : content) {
+                        if(!newArtistName.equals("")) {
+                            MetaDataController.changeArtistName(song, newArtistName);
+                        }
+
+                        if(!newAlbumName.equals("")) {
+                            MetaDataController.changeAlbumName(song, newAlbumName);
+                        }
+
+                        if(!newSongGenre.equals("")) {
+                            MetaDataController.changeSongGenre(song, newSongGenre);
+                        }
+
+                        if(!newRecordingDate.equals("")) {
+                            MetaDataController.changeRecordingDate(song, newRecordingDate);
+                        }
+
+                        if (mNewAlbumArtFile != null) {
+                            MetaDataController.changeAlbumArt(song, mNewAlbumArtFile);
+                        }
+                    }
+
+                    mNewAlbumArtFile = null;
+                    mEditCompleteListener.editComplete();
+                } catch(CannotWriteException e) {
+                    Toast.makeText(context, "Can't change meta data.",
+                            Toast.LENGTH_SHORT).show();
+                } catch (InvalidCharactersUsedException e) {
+                    Toast.makeText(context, "Invalid characters used for " + e.getMessage() + ".",
+                            Toast.LENGTH_SHORT).show();
+                } catch (InvalidAlbumArtException e) {
+                    Toast.makeText(context, "Invalid file used for album art.",
+                            Toast.LENGTH_SHORT).show();
+                } catch (CannotReadAlbumArtException e) {
+                    Toast.makeText(context, "Could not read image chosen for album art.",
+                            Toast.LENGTH_SHORT).show();
+                }
             }
         });
         builder.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
+                mNewAlbumArtFile = null;
                 dialogInterface.cancel();
             }
         });
