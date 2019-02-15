@@ -1,54 +1,119 @@
 package com.filipe.molder;
 
 
-import android.database.Cursor;
-import android.net.Uri;
-import android.provider.MediaStore;
-import android.util.Log;
+import org.jaudiotagger.audio.AudioFile;
+import org.jaudiotagger.tag.Tag;
+import org.jaudiotagger.tag.images.Artwork;
 
 //Store's an MP3 file's meta data
 public class MetaData {
 
-    private int mSongId;
+    /*
+     * mAudioFile and mTag are stored for use later when changing the
+     * metadata of a song. This way no more is needed to be spent on
+     * reading an mp3 file again.
+     */
+    private AudioFile mAudioFile;
+    private Tag mTag;
+    private boolean mMetaDataSet;
+    private String mSongOrder;
+    private Artwork mAlbumArt;
     private String mSongName;
     private String mArtistName;
     private String mAlbumName;
+    private String mSongGenre;
     private String mSongNumber;
     private String mRecordingDate;
-    private int mAlbumArtId;
+    /*
+     * mErrorOccurred and mErrorMessage are used for when there was an error
+     * when attempting to generate the metadata of a song. If there was,
+     * an error message that specifies to the user what went wrong with
+     * can be given when they try to interact with a file that couldn't
+     * be read.
+     */
+    private boolean mErrorOccurred;
+    private String mErrorMessage;
 
+    public MetaData(String songOrder) {
+        mMetaDataSet = false;
+        mSongOrder = songOrder;
+        mErrorOccurred = false;
+        mErrorMessage = "";
+    }
 
-    public MetaData(int songId, int albumArtId, String songNAme, String artistName, String albumName,
-                    String songNumber, String recordingDate) {
-        mSongId = songId;
-        mAlbumArtId = albumArtId;
-        mSongName = songNAme;
+    public void setAudioFile(AudioFile audioFile) {
+        mAudioFile = audioFile;
+    }
+
+    public void setTag(Tag tag) {
+        mTag = tag;
+    }
+
+    public void setMetaData(Artwork albumArt, String songName, String artistName, String albumName,
+                            String songGenre, String songNumber, String recordingDate) {
+        mAlbumArt = albumArt;
+        mSongName = songName;
         mArtistName = artistName;
         mAlbumName = albumName;
+        mSongGenre = songGenre;
         mSongNumber = songNumber;
         mRecordingDate = recordingDate;
+
+        mMetaDataSet = true;
+    }
+
+    public void setAlbumArt(Artwork albumArt) {
+        mAlbumArt = albumArt;
     }
 
     public void setSongName(String songName) {
-        this.mSongName = songName;
+        mSongName = songName;
     }
 
     public void setArtistName(String artistName) {
-        this.mArtistName = artistName;
+        mArtistName = artistName;
     }
 
     public void setAlbumName(String albumName) {
-        this.mAlbumName = albumName;
+        mAlbumName = albumName;
+    }
+
+    public void setSongGenre(String songGenre) {
+        mSongGenre = songGenre;
     }
 
     public void setSongNumber(String songNumber) {
-        this.mSongNumber = songNumber;
+        mSongNumber = songNumber;
     }
 
     public void setRecordingDate(String recordingDate) {
-        this.mRecordingDate = recordingDate;
+        mRecordingDate = recordingDate;
     }
 
+    public void errorHasOccurred(String errorMessage) {
+        mErrorOccurred = true;
+        mErrorMessage = errorMessage;
+    }
+
+    public AudioFile getAudioFile() {
+        return mAudioFile;
+    }
+
+    public Tag getTag() {
+        return mTag;
+    }
+
+    public boolean isMetaDataSet() {
+        return mMetaDataSet;
+    }
+
+    public String getSongOrder() {
+        return mSongOrder;
+    }
+
+    public Artwork getAlbumArt() {
+        return mAlbumArt;
+    }
 
     public String getSongName() {
         return mSongName;
@@ -62,6 +127,10 @@ public class MetaData {
         return mAlbumName;
     }
 
+    public String getSongGenre() {
+        return mSongGenre;
+    }
+
     public String getSongNumber() {
         return mSongNumber;
     }
@@ -70,54 +139,11 @@ public class MetaData {
         return mRecordingDate;
     }
 
-
-    public String getGenre(MainActivity context) {
-        /*
-         * Here the Media Store is being used to get the genre of this song.
-         *
-         * The query is looking for the genre that has the ID that is the
-         * same as the mSongId.
-         */
-        Uri uri = MediaStore.Audio.Genres.getContentUriForAudioId("external", mSongId);
-        Cursor cursor = context.getContentResolver().query(uri,
-                new String[] {MediaStore.Audio.Genres.NAME, MediaStore.Audio.Genres._ID},
-                null, null, null);
-
-        String genre = "";
-        if (cursor.moveToNext()) {
-            int genreColumn = cursor.getColumnIndex(MediaStore.Audio.Genres.NAME);
-
-            genre = cursor.getString(genreColumn);
-        }
-
-        cursor.close();
-
-        return genre;
+    public boolean hasErrorOccurred() {
+        return mErrorOccurred;
     }
 
-    public String getAlbumArtPath(MainActivity context) {
-        /*
-         * Here the Media Store is being used to get the file path of the cached album art.
-         *
-         * The query is looking for the album art that has the album art ID that is the
-         * same as the mAlbumArtId.
-         */
-        Cursor cursor = context.getContentResolver().query(
-                MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI,
-                new String[] {MediaStore.Audio.Albums._ID, MediaStore.Audio.Albums.ALBUM_ART},
-                MediaStore.Audio.Albums._ID + " = ? ",
-                new String[] {String.valueOf(mAlbumArtId)},
-                null);
-
-        String albumArtPath = "";
-        if (cursor.moveToNext()) {
-            int albumArtColumn = cursor.getColumnIndex(MediaStore.Audio.Albums.ALBUM_ART);
-
-            albumArtPath = cursor.getString(albumArtColumn);
-        }
-
-        cursor.close();
-
-        return albumArtPath;
+    public String getErrorMessage() {
+        return mErrorMessage;
     }
 }

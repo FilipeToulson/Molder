@@ -13,7 +13,8 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 
-import java.util.ArrayList;
+import org.jaudiotagger.tag.images.Artwork;
+
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -31,6 +32,10 @@ public class ContentsListAdapter extends RecyclerView.Adapter {
 
     public void setContentsList(List<Content> contentsList) {
         mContentsList = contentsList;
+        refreshList();
+    }
+
+    public void refreshList() {
         notifyDataSetChanged();
     }
 
@@ -111,15 +116,19 @@ public class ContentsListAdapter extends RecyclerView.Adapter {
         private void bindSong() {
             MetaData metaData = mContent.getMetaData();
 
-            /*
-             * Song name and artist name are set separately so that the longer running
-             * tasks of getting the album art path, decoding the file to get the
-             * bitmap, and then setting the image don't cause the setting of the song
-             * name and artist name to be done later than it could have been done.
-             */
-            final String songName = metaData.getSongName();
-            final String artistName = metaData.getArtistName();
+            if(!metaData.isMetaDataSet()) {
+                MetaDataController.generateSongMetaData(mContent, metaData);
+            }
 
+            final String songName = metaData.getSongName();
+            final String artistName =  metaData.getArtistName();
+
+            /*
+             * Song name and artist name are set separately from album art so that the longer
+             * running tasks of decoding the file to get the bitmap, and then setting the image
+             * don't cause the setting of the song name and artist name to be done later than it
+             * could have been done.
+             */
             mContext.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -128,14 +137,19 @@ public class ContentsListAdapter extends RecyclerView.Adapter {
                 }
             });
 
-            final String albumArtPath = metaData.getAlbumArtPath(mContext);
-            final Bitmap bitmap = BitmapFactory.decodeFile(albumArtPath);
+            Artwork albumArt = metaData.getAlbumArt();
+            Bitmap bitmap = null;
+            if(albumArt != null) {
+                byte[] data = albumArt.getBinaryData();
+                bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
+            }
 
+            final Bitmap finalBitmap = bitmap;
             mContext.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    if (bitmap != null) {
-                        Glide.with(mContext).load(bitmap).into(mContentImageView);
+                    if (finalBitmap != null) {
+                        Glide.with(mContext).load(finalBitmap).into(mContentImageView);
                     } else {
                         Glide.with(mContext).load(R.drawable.placeholder).into(mContentImageView);
                     }

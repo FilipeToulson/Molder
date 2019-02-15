@@ -3,6 +3,7 @@ package com.filipe.molder;
 
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 import java.io.File;
 
@@ -19,16 +20,32 @@ public class BaseState implements AppState {
         if (content.getFile().isDirectory()) {
             FileController.moveToDirectory(content, true);
         } else {
-            Log.d("BaseState", "Song Clicked");
+            MetaData metaData = content.getMetaData();
+
+            if(metaData.hasErrorOccurred()) {
+                Toast.makeText(mContext, metaData.getErrorMessage(), Toast.LENGTH_SHORT).show();
+            } else {
+                Log.d("BaseState", "Song Clicked");
+            }
         }
     }
 
     @Override
     public void contentOnLongClick(Content content, View view) {
-        mContext.showControlsBar(true);
+        MetaData metaData = content.getMetaData();
 
-        AppState appState = new SelectionState(content, view, mContext);
-        mContext.setState(appState);
+        if(!content.getFile().isDirectory() && metaData.hasErrorOccurred()) {
+            //This is a song that had an error when metadata was attempted to be generated for it
+
+            Toast.makeText(mContext, metaData.getErrorMessage(), Toast.LENGTH_SHORT).show();
+        } else {
+            //This is a song or directory
+
+            mContext.showControlsBar(true);
+
+            AppState appState = new SelectionState(content, view, mContext);
+            mContext.setState(appState);
+        }
     }
 
     @Override

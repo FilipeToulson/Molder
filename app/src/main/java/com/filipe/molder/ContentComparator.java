@@ -30,8 +30,8 @@ public class ContentComparator implements Comparator<Content> {
             MetaData metaDataA = contentA.getMetaData();
             MetaData metaDataB = contentB.getMetaData();
 
-            String songNameA = metaDataA.getSongName();
-            String songNameB = metaDataB.getSongName();
+            String songNameA = metaDataA.getSongOrder();
+            String songNameB = metaDataB.getSongOrder();
             compareResult = songNameA.compareTo(songNameB);
         }  else if (contentA instanceof Directory && contentB instanceof Song) {
             compareResult = A_GREATER_THAN_B;

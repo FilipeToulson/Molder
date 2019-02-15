@@ -12,6 +12,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -24,6 +25,7 @@ public class MainActivity extends AppCompatActivity {
 
     private static final int PERMISSIONS_ACTIVITY_REQUEST_CODE = 0;
     private static final int PHOTO_PICKER_ACTIVITY_REQUEST_CODE = 1;
+    private ContentsListAdapter mContentsListAdapter;
     private AppState mCurrentState;
     private ConstraintLayout mControlsBar;
     private int mControlsBarHeight;
@@ -68,14 +70,17 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void init() {
+        long time= System.currentTimeMillis();
+        Log.d("TIME_COUNT", "The time is: " + time);
+
         mControlsBar = findViewById(R.id.controlsBar);
         mControlsBarHeight = mControlsBar.getMaxHeight();
         mControlsBar.setMaxHeight(0);
 
         RecyclerView contentsList = findViewById(R.id.contentsList);
         contentsList.setLayoutManager(new LinearLayoutManager(this));
-        ContentsListAdapter contentsListAdapter = new ContentsListAdapter(this);
-        contentsList.setAdapter(contentsListAdapter);
+        mContentsListAdapter = new ContentsListAdapter(this);
+        contentsList.setAdapter(mContentsListAdapter);
 
         RecyclerView navigationBar = findViewById(R.id.navigationBar);
         navigationBar.setLayoutManager(new LinearLayoutManager(this,
@@ -85,13 +90,19 @@ public class MainActivity extends AppCompatActivity {
 
         File root = Environment.getExternalStorageDirectory();
         FileController.setContext(this);
-        FileController.setContentsListAdapter(contentsListAdapter);
+        FileController.setContentsListAdapter(mContentsListAdapter);
         FileController.setNavBarAdapter(navigationBarAdapter);
         FileController.constructFileTree(root);
 
         MetaDataController.setContext(this);
 
         mCurrentState = new BaseState(this);
+
+        long newTime= System.currentTimeMillis();
+        Log.d("TIME_COUNT", "The time now is: " + newTime);
+
+        long diff = newTime - time;
+        Log.d("TIME_COUNT", "The time diff is: " + diff);
     }
 
     public void contentOnClick(Content content, View view) {
@@ -114,6 +125,10 @@ public class MainActivity extends AppCompatActivity {
         Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
         photoPickerIntent.setType("image/*");
         startActivityForResult(photoPickerIntent, PHOTO_PICKER_ACTIVITY_REQUEST_CODE);
+    }
+
+    public void refreshContentsList() {
+        mContentsListAdapter.refreshList();
     }
 
     public void showControlsBar(boolean showControlsBar) {

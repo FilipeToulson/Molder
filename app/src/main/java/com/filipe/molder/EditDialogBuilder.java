@@ -8,7 +8,6 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.v7.app.AlertDialog;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -91,10 +90,10 @@ public class EditDialogBuilder {
         final String songName = metaData.getSongName();
         final String artistName = metaData.getArtistName();
         final String albumName  = metaData.getAlbumName();
-        final String songGenre = metaData.getGenre(context);
+        final String songGenre = metaData.getSongGenre();
         final String songNumber = metaData.getSongNumber();
         final String recordingDate = metaData.getRecordingDate();
-        String albumArtPath = metaData.getAlbumArtPath(context);
+        Artwork albumArt = metaData.getAlbumArt();
 
         final View editSongDialogLayout = context.getLayoutInflater().inflate(
                 R.layout.edit_song_dialog, null, false);
@@ -118,7 +117,12 @@ public class EditDialogBuilder {
         recordingDateEdit.setText(recordingDate);
 
         mEditAlbumArt = editSongDialogLayout.findViewById(R.id.albumArt);
-        final Bitmap bitmap = BitmapFactory.decodeFile(albumArtPath);
+        Bitmap bitmap = null;
+        if(albumArt != null) {
+            byte[] data = albumArt.getBinaryData();
+            bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
+        }
+
         if (bitmap != null) {
             Glide.with(context).load(bitmap).into(mEditAlbumArt);
         } else {
@@ -144,73 +148,46 @@ public class EditDialogBuilder {
                 try {
                     if(!songName.equals(newSongName)) {
                         MetaDataController.changeSongName(song, newSongName);
-
-                        metaDataChanged = true;
                     }
 
                     if(!artistName.equals(newArtistName)) {
                         MetaDataController.changeArtistName(song, newArtistName);
-
-                        metaDataChanged = true;
                     }
 
                     if(!albumName.equals(newAlbumName)) {
                         MetaDataController.changeAlbumName(song, newAlbumName);
-
-                        metaDataChanged = true;
                     }
 
                     if(!songGenre.equals(newSongGenre)) {
                         MetaDataController.changeSongGenre(song, newSongGenre);
-
-                        metaDataChanged = true;
                     }
 
                     if(!songNumber.equals(newSongNumber)) {
                         MetaDataController.changeSongNumber(song, newSongNumber);
-
-                        metaDataChanged = true;
                     }
 
                     if(!recordingDate.equals(newRecordingDate)) {
                         MetaDataController.changeRecordingDate(song, newRecordingDate);
-
-                        metaDataChanged = true;
                     }
 
                     if(mNewAlbumArtFile != null) {
-                        Artwork newAlbumArt = ArtworkFactory.createArtworkFromFile(mNewAlbumArtFile);
-                        MetaDataController.changeAlbumArt(song, newAlbumArt);
+                        MetaDataController.changeAlbumArt(song, mNewAlbumArtFile);
 
                         mNewAlbumArtFile = null;
-                        metaDataChanged = true;
-                    }
-
-                    if(metaDataChanged) {
-                        MetaDataController.scanSong(song);
                     }
 
                     mEditCompleteListener.editComplete();
-                } catch(CannotReadException e) {
-                    Toast.makeText(context, "Can't read song meta data.",
-                            Toast.LENGTH_SHORT).show();
-                } catch(ReadOnlyFileException e) {
-                    Toast.makeText(context, "The song is read only.",
-                            Toast.LENGTH_SHORT).show();
                 } catch(CannotWriteException e) {
                     Toast.makeText(context, "Can't change meta data.",
                             Toast.LENGTH_SHORT).show();
                 } catch (InvalidCharactersUsedException e) {
                     Toast.makeText(context, "Invalid characters used for " + e.getMessage() + ".",
                             Toast.LENGTH_SHORT).show();
-                } catch (IncorrectFileFormatException e) {
-                    Toast.makeText(context, "This song isn't an MP3.",
-                            Toast.LENGTH_SHORT).show();
                 } catch (InvalidAlbumArtException e) {
                     Toast.makeText(context, "Invalid file used for album art.",
                             Toast.LENGTH_SHORT).show();
-                } catch (IOException e) {
-                    Toast.makeText(context, "Could not use image chosen for album art.",
+                } catch (CannotReadAlbumArtException e) {
+                    Toast.makeText(context, "Could not read image chosen for album art.",
                             Toast.LENGTH_SHORT).show();
                 }
             }

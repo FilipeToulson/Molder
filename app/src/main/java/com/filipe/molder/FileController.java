@@ -8,6 +8,9 @@ import android.util.Log;
 import org.apache.commons.io.FilenameUtils;
 import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.audio.AudioFileIO;
+import org.jaudiotagger.tag.FieldKey;
+import org.jaudiotagger.tag.Tag;
+import org.jaudiotagger.tag.images.Artwork;
 
 import java.io.File;
 
@@ -38,6 +41,7 @@ public class FileController {
         Content rootDir = new Directory(rootFileObject, null);
 
         addContentsToDir(rootDir, rootFileObject);
+        rootDir.getFiles().sort(new ContentComparator());
         moveToDirectory(rootDir, true);
     }
 
@@ -55,7 +59,6 @@ public class FileController {
                         addContentsToDir(dir, file);
                         addSongsToDir(dir, file);
 
-                        //This call to sort, sorts songs within a directory
                         dir.getFiles().sort(new ContentComparator());
                     } else {
                         addContentsToDir(rootDir, file);
@@ -63,9 +66,6 @@ public class FileController {
                 }
             }
         }
-
-        //This call to sort, sorts directories within a directory
-        rootDir.getFiles().sort(new ContentComparator());
     }
 
     private static boolean containsSongs(File dir) {
@@ -111,40 +111,24 @@ public class FileController {
         if(cursor != null && cursor.moveToFirst()) {
             do {
                 //These refer to the column number where certain information is stored:
-                int songIdColumn = cursor.getColumnIndex(MediaStore.Audio.Media._ID);
-                int albumIdColumn = cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID);
-                int songNameColumn = cursor.getColumnIndex(MediaStore.Audio.Media.TITLE);
-                int artistNameColumn = cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST);
-                int albumNameColumn = cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM);
-                int songNumberColumn = cursor.getColumnIndex(MediaStore.Audio.Media.TRACK);
-                int recordingDateColumn  = cursor.getColumnIndex(MediaStore.Audio.Media.YEAR);
                 int filePathColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA);
+                int sortOrderColumn = cursor.getColumnIndex(MediaStore.Audio.Media.DEFAULT_SORT_ORDER);
 
-                int songId = cursor.getInt(songIdColumn);
-                int albumArtId = cursor.getInt(albumIdColumn);
-
-                String songName = cursor.getString(songNameColumn);
-                songName = (songName == null) ? "" : songName;
-
-                String artistName = cursor.getString(artistNameColumn);
-                artistName = (artistName == null) ? "" : artistName;
-
-                String albumName = cursor.getString(albumNameColumn);
-                albumName = (albumName == null) ? "" : albumName;
-
-                String songNumber = cursor.getString(songNumberColumn);
-                songNumber = (songNumber == null) ? "" : songNumber;
-
-                String recordingDate = cursor.getString(recordingDateColumn);
-                recordingDate = (recordingDate == null) ? "" : recordingDate;
-
+                /*
+                 * Even though the media store is not used to obtain the metadata of a song, it is
+                 * still used to get information that is required on app startup quickly. For
+                 * instance, song sorting order is obtained in order to not have to read the file
+                 * in order to get the name of the song.
+                 */
                 String songFilePath = cursor.getString(filePathColumn);
+                String songOrder = cursor.getString(sortOrderColumn);
+
+                Log.d("STOP_THIS", "Song order: " + songOrder);
+
                 File songFileObject = new File(songFilePath);
+                MetaData metaData = new MetaData(songOrder);
 
-                MetaData metaData = new MetaData(songId, albumArtId, songName, artistName, albumName, songNumber,
-                        recordingDate);
                 Song song = new Song(songFileObject, metaData);
-
                 dir.addFile(song);
             } while (cursor.moveToNext());
 

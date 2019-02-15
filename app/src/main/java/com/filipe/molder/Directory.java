@@ -51,7 +51,7 @@ public class Directory implements Content {
 
     @Override
     public MetaData getMetaData() {
-        //This method is to be used by this class
+        //This method is not to be used by this class
         return null;
     }
 

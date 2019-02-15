@@ -106,6 +106,7 @@ public class SelectionState implements AppState, EditCompleteListener {
     @Override
     public void editComplete() {
         exitSelectionState();
+        mContext.refreshContentsList();
     }
 
     @Override
