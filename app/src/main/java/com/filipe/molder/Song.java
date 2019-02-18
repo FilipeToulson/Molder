@@ -31,6 +31,12 @@ public class Song implements Content {
     }
 
     @Override
+    public void setFile(File file) {
+        mFile = file;
+    }
+
+
+    @Override
     public List<Content> getFiles() {
         //This method is not to be used by this class
         return null;

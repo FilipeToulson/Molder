@@ -40,6 +40,11 @@ public class Directory implements Content {
     }
 
     @Override
+    public void setFile(File file) {
+        mFile = file;
+    }
+
+    @Override
     public int getNumberOfItems() {
         return mFiles.size();
     }

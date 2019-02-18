@@ -123,8 +123,6 @@ public class FileController {
                 String songFilePath = cursor.getString(filePathColumn);
                 String songOrder = cursor.getString(sortOrderColumn);
 
-                Log.d("STOP_THIS", "Song order: " + songOrder);
-
                 File songFileObject = new File(songFilePath);
                 MetaData metaData = new MetaData(songOrder);
 

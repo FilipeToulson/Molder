@@ -52,11 +52,11 @@ public class EditDialogBuilder {
         return builder;
     }
 
-    private static AlertDialog.Builder buildDirEditDialog(MainActivity context,
+    private static AlertDialog.Builder buildDirEditDialog(final MainActivity context,
                                                           List<Content> content) {
-        Directory directory = (Directory)content.get(0);
-        File file = directory.getFile();
-        final String dirName = file.getName();
+        final Directory directory = (Directory)content.get(0);
+        final File oldFile = directory.getFile();
+        final String dirName = oldFile.getName();
 
         final View editDirDialogLayout = context.getLayoutInflater().inflate(
                 R.layout.edit_dir_dialog, null, false);
@@ -71,7 +71,28 @@ public class EditDialogBuilder {
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                //TODO: implement changing of directory name.
+                String newFileName = dirNameEdit.getText().toString();
+                String oldFilePath = oldFile.getPath();
+                String filePathNoName = oldFilePath.substring(0, oldFilePath.lastIndexOf("/"));
+                File newFile = new File(filePathNoName + "/" + newFileName);
+
+                if(newFile.exists()){
+                    Toast.makeText(context, "A folder with name \"" + newFileName +
+                            "\" already exists.", Toast.LENGTH_SHORT).show();
+                } else {
+                    boolean renamingSuccessful = oldFile.renameTo(newFile);
+
+                    if (renamingSuccessful) {
+                        directory.setFile(newFile);
+                    } else {
+                        Toast.makeText(context, "Could not rename folder.",
+                                Toast.LENGTH_SHORT).show();
+                    }
+
+                    updateContents(directory, oldFilePath, newFile.getPath());
+                }
+
+                mEditCompleteListener.editComplete();
             }
         });
         builder.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
@@ -82,6 +103,30 @@ public class EditDialogBuilder {
         });
 
         return builder;
+    }
+
+    /*
+     * This method updates the path of the files within a directory to the newly renamed path that
+     * was created as a result of renaming the directory.
+     */
+    private static void updateContents(Content dir, String oldFilePath, String newFilePath) {
+        List<Content> contents = dir.getFiles();
+
+        for(Content content : contents) {
+            File contentFile = content.getFile();
+            String contentFilePath = contentFile.getPath();
+            String newContentFilePath = newFilePath +
+                    contentFilePath.substring(oldFilePath.length(), contentFilePath.length());
+            File newFile = new File(newContentFilePath);
+            content.setFile(newFile);
+
+            if(content instanceof Directory) {
+                updateContents(content, oldFilePath, newFilePath);
+            } else if(content instanceof Song) {
+                //Need to scan songs as to update their paths in the media store:
+                MetaDataController.scanSong(content);
+            }
+        }
     }
 
     private static AlertDialog.Builder buildSongEditDialog(final MainActivity context,
