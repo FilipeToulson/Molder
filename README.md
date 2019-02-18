@@ -15,7 +15,7 @@ With this comes the ability to:
 - Copy songs and directories
 - Move songs and directories
 
-#### Edit Metadata (Featrue not yet implemented)
+#### Edit Metadata (Featrue now implemented)
 With Molder you can edit:
 - Song name
 - Album name
