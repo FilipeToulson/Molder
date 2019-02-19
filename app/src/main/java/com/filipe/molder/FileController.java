@@ -3,16 +3,11 @@ package com.filipe.molder;
 
 import android.database.Cursor;
 import android.provider.MediaStore;
-import android.util.Log;
 
 import org.apache.commons.io.FilenameUtils;
-import org.jaudiotagger.audio.AudioFile;
-import org.jaudiotagger.audio.AudioFileIO;
-import org.jaudiotagger.tag.FieldKey;
-import org.jaudiotagger.tag.Tag;
-import org.jaudiotagger.tag.images.Artwork;
 
 import java.io.File;
+import java.util.List;
 
 /*
  * Handles tasks to do with the file system such as moving to
@@ -180,5 +175,51 @@ public class FileController {
         }
 
         return atRootDir;
+    }
+
+    public static void changeDirectoryName(Content directory, String newFileName)
+            throws FileAlreadyExistsException, CouldNotRenameFolderException {
+        File oldFile = directory.getFile();
+        String oldFilePath = oldFile.getPath();
+        String filePathNoName = oldFilePath.substring(0, oldFilePath.lastIndexOf("/"));
+        File newFile = new File(filePathNoName + "/" + newFileName);
+
+        if(newFile.exists()){
+            throw new FileAlreadyExistsException();
+        } else {
+            boolean renamingSuccessful = oldFile.renameTo(newFile);
+
+            if (renamingSuccessful) {
+                directory.setFile(newFile);
+            } else {
+                throw new CouldNotRenameFolderException();
+            }
+
+            updateContents(directory, oldFilePath, newFile.getPath());
+        }
+    }
+
+    /*
+     * This method updates the path of the files within a directory to the newly renamed path that
+     * was created as a result of renaming the directory.
+     */
+    private static void updateContents(Content dir, String oldFilePath, String newFilePath) {
+        List<Content> contents = dir.getFiles();
+
+        for(Content content : contents) {
+            File contentFile = content.getFile();
+            String contentFilePath = contentFile.getPath();
+            String newContentFilePath = newFilePath +
+                    contentFilePath.substring(oldFilePath.length(), contentFilePath.length());
+            File newFile = new File(newContentFilePath);
+            content.setFile(newFile);
+
+            if(content instanceof Directory) {
+                updateContents(content, oldFilePath, newFilePath);
+            } else if(content instanceof Song) {
+                //Need to scan songs as to update their paths in the media store:
+                MetaDataController.scanSong(content);
+            }
+        }
     }
 }
