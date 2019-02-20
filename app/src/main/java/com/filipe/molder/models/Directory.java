@@ -1,5 +1,7 @@
-package com.filipe.molder;
+package com.filipe.molder.models;
 
+
+import com.filipe.molder.interfaces.Content;
 
 import java.io.File;
 import java.util.ArrayList;

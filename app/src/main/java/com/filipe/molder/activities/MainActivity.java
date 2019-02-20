@@ -1,4 +1,4 @@
-package com.filipe.molder;
+package com.filipe.molder.activities;
 
 import android.Manifest;
 import android.content.Intent;
@@ -17,6 +17,19 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.filipe.molder.interfaces.AppState;
+import com.filipe.molder.utils.BaseState;
+import com.filipe.molder.interfaces.Content;
+import com.filipe.molder.adapters.ContentsListAdapter;
+import com.filipe.molder.interfaces.DeleteCompleteListener;
+import com.filipe.molder.utils.DeleteWarningDialogBuilder;
+import com.filipe.molder.interfaces.EditCompleteListener;
+import com.filipe.molder.utils.EditDialogBuilder;
+import com.filipe.molder.utils.FileUtils;
+import com.filipe.molder.utils.MetaDataUtils;
+import com.filipe.molder.adapters.NavigationBarAdapter;
+import com.filipe.molder.R;
 
 import java.io.File;
 import java.util.List;
@@ -90,12 +103,12 @@ public class MainActivity extends AppCompatActivity {
         navigationBar.setAdapter(navigationBarAdapter);
 
         File root = Environment.getExternalStorageDirectory();
-        FileController.setContext(this);
-        FileController.setContentsListAdapter(mContentsListAdapter);
-        FileController.setNavBarAdapter(navigationBarAdapter);
-        FileController.constructFileTree(root);
+        FileUtils.setContext(this);
+        FileUtils.setContentsListAdapter(mContentsListAdapter);
+        FileUtils.setNavBarAdapter(navigationBarAdapter);
+        FileUtils.constructFileTree(root);
 
-        MetaDataController.setContext(this);
+        MetaDataUtils.setContext(this);
 
         mCurrentState = new BaseState(this);
 

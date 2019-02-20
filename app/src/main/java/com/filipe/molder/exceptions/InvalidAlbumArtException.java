@@ -1,10 +1,10 @@
-package com.filipe.molder;
+package com.filipe.molder.exceptions;
 
 /*
  * Thrown when a file is attempted to be written as a song's
  * new album art image.
  */
-class InvalidAlbumArtException extends Exception {
+public class InvalidAlbumArtException extends Exception {
     public InvalidAlbumArtException() {
         super();
     }

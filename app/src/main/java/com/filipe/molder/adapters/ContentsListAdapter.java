@@ -1,4 +1,4 @@
-package com.filipe.molder;
+package com.filipe.molder.adapters;
 
 
 import android.graphics.Bitmap;
@@ -12,6 +12,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.filipe.molder.R;
+import com.filipe.molder.activities.MainActivity;
+import com.filipe.molder.interfaces.Content;
+import com.filipe.molder.models.MetaData;
+import com.filipe.molder.utils.MetaDataUtils;
 
 import org.jaudiotagger.tag.images.Artwork;
 
@@ -121,7 +126,7 @@ public class ContentsListAdapter extends RecyclerView.Adapter {
             MetaData metaData = mContent.getMetaData();
 
             if(!metaData.isMetaDataSet()) {
-                MetaDataController.generateSongMetaData(mContent, metaData);
+                MetaDataUtils.generateSongMetaData(mContent, metaData);
             }
 
             final String songName = metaData.getSongName();

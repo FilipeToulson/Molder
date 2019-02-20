@@ -1,8 +1,13 @@
-package com.filipe.molder;
+package com.filipe.molder.utils;
 
 
 import android.content.DialogInterface;
 import android.support.v7.app.AlertDialog;
+
+import com.filipe.molder.exceptions.FileCouldNotBeDeletedException;
+import com.filipe.molder.activities.MainActivity;
+import com.filipe.molder.interfaces.Content;
+import com.filipe.molder.interfaces.DeleteCompleteListener;
 
 import java.util.List;
 
@@ -25,7 +30,7 @@ public class DeleteWarningDialogBuilder {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 try {
-                    FileController.deleteFiles(null, content);
+                    FileUtils.deleteFiles(null, content);
                 } catch (FileCouldNotBeDeletedException e) {
                     context.showErrorMessage("Could not delete " + e.getMessage() + ".");
                 }

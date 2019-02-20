@@ -1,5 +1,10 @@
-package com.filipe.molder;
+package com.filipe.molder.utils;
 
+
+import com.filipe.molder.interfaces.Content;
+import com.filipe.molder.models.Directory;
+import com.filipe.molder.models.MetaData;
+import com.filipe.molder.models.Song;
 
 import java.io.File;
 import java.util.Comparator;

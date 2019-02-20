@@ -1,7 +1,14 @@
-package com.filipe.molder;
+package com.filipe.molder.utils;
 
 
 import android.media.MediaScannerConnection;
+
+import com.filipe.molder.exceptions.CannotReadAlbumArtException;
+import com.filipe.molder.interfaces.Content;
+import com.filipe.molder.exceptions.InvalidAlbumArtException;
+import com.filipe.molder.exceptions.InvalidCharactersUsedException;
+import com.filipe.molder.models.MetaData;
+import com.filipe.molder.activities.MainActivity;
 
 import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.audio.AudioFileIO;
@@ -22,7 +29,7 @@ import java.io.IOException;
  * Handles tasks to do with song metadata, mainly writing changes made
  * to the metadata of a given song.
  */
-public class MetaDataController {
+public class MetaDataUtils {
     private static MainActivity mContext;
 
     public static void setContext(MainActivity context) {

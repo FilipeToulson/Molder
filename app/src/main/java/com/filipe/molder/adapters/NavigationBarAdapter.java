@@ -1,4 +1,4 @@
-package com.filipe.molder;
+package com.filipe.molder.adapters;
 
 
 import android.support.v7.widget.RecyclerView;
@@ -7,11 +7,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.filipe.molder.R;
+import com.filipe.molder.activities.MainActivity;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-class NavigationBarAdapter extends RecyclerView.Adapter {
+public class NavigationBarAdapter extends RecyclerView.Adapter {
 
     private List<File> mDirsList;
     private MainActivity mContext;

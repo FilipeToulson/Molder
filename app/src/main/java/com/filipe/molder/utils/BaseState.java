@@ -1,9 +1,14 @@
-package com.filipe.molder;
+package com.filipe.molder.utils;
 
 
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
+
+import com.filipe.molder.activities.MainActivity;
+import com.filipe.molder.interfaces.AppState;
+import com.filipe.molder.interfaces.Content;
+import com.filipe.molder.models.MetaData;
 
 import java.io.File;
 
@@ -18,7 +23,7 @@ public class BaseState implements AppState {
     @Override
     public void contentOnClick(Content content, View view) {
         if (content.getFile().isDirectory()) {
-            FileController.moveToDirectory(content, true);
+            FileUtils.moveToDirectory(content, true);
         } else {
             MetaData metaData = content.getMetaData();
 
@@ -40,7 +45,7 @@ public class BaseState implements AppState {
 
     @Override
     public void navBarOnClick(File directory) {
-        FileController.moveBackToDir(directory);
+        FileUtils.moveBackToDir(directory);
     }
 
     @Override
@@ -55,10 +60,10 @@ public class BaseState implements AppState {
 
     @Override
     public void onBackPressed() {
-        if (FileController.atRootDir()) {
+        if (FileUtils.atRootDir()) {
             mContext.exitApp();
         } else {
-            FileController.moveBackDirOnce();
+            FileUtils.moveBackDirOnce();
         }
     }
 }

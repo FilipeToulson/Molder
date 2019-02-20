@@ -1,4 +1,4 @@
-package com.filipe.molder;
+package com.filipe.molder.interfaces;
 
 
 public interface EditCompleteListener {

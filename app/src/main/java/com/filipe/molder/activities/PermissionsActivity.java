@@ -1,4 +1,4 @@
-package com.filipe.molder;
+package com.filipe.molder.activities;
 
 import android.Manifest;
 import android.content.DialogInterface;
@@ -9,6 +9,8 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Toast;
+
+import com.filipe.molder.R;
 
 /*
  * This activity is used to request the user to grant the permissions

@@ -1,9 +1,18 @@
-package com.filipe.molder;
+package com.filipe.molder.utils;
 
 
 import android.graphics.Color;
 import android.util.Log;
 import android.view.View;
+
+import com.filipe.molder.activities.MainActivity;
+import com.filipe.molder.interfaces.AppState;
+import com.filipe.molder.interfaces.Content;
+import com.filipe.molder.interfaces.DeleteCompleteListener;
+import com.filipe.molder.interfaces.EditCompleteListener;
+import com.filipe.molder.models.Directory;
+import com.filipe.molder.models.MetaData;
+import com.filipe.molder.models.Song;
 
 import java.io.File;
 import java.util.ArrayList;

@@ -1,4 +1,4 @@
-package com.filipe.molder;
+package com.filipe.molder.utils;
 
 
 import android.content.DialogInterface;
@@ -13,6 +13,18 @@ import android.widget.EditText;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
+import com.filipe.molder.exceptions.CannotReadAlbumArtException;
+import com.filipe.molder.interfaces.Content;
+import com.filipe.molder.exceptions.CouldNotRenameFolderException;
+import com.filipe.molder.models.Directory;
+import com.filipe.molder.interfaces.EditCompleteListener;
+import com.filipe.molder.exceptions.FileAlreadyExistsException;
+import com.filipe.molder.exceptions.InvalidAlbumArtException;
+import com.filipe.molder.exceptions.InvalidCharactersUsedException;
+import com.filipe.molder.models.MetaData;
+import com.filipe.molder.R;
+import com.filipe.molder.models.Song;
+import com.filipe.molder.activities.MainActivity;
 
 import org.jaudiotagger.audio.exceptions.CannotWriteException;
 import org.jaudiotagger.tag.images.Artwork;
@@ -68,7 +80,7 @@ public class EditDialogBuilder {
                 String newFileName = dirNameEdit.getText().toString();
 
                 try {
-                    FileController.changeDirectoryName(directory, newFileName);
+                    FileUtils.changeDirectoryName(directory, newFileName);
                 } catch (FileAlreadyExistsException e) {
                     context.showErrorMessage("A folder with name \"" + newFileName +
                             "\" already exists.");
@@ -152,31 +164,31 @@ public class EditDialogBuilder {
 
                 try {
                     if(!songName.equals(newSongName)) {
-                        MetaDataController.changeSongName(song, newSongName);
+                        MetaDataUtils.changeSongName(song, newSongName);
                     }
 
                     if(!artistName.equals(newArtistName)) {
-                        MetaDataController.changeArtistName(song, newArtistName);
+                        MetaDataUtils.changeArtistName(song, newArtistName);
                     }
 
                     if(!albumName.equals(newAlbumName)) {
-                        MetaDataController.changeAlbumName(song, newAlbumName);
+                        MetaDataUtils.changeAlbumName(song, newAlbumName);
                     }
 
                     if(!songGenre.equals(newSongGenre)) {
-                        MetaDataController.changeSongGenre(song, newSongGenre);
+                        MetaDataUtils.changeSongGenre(song, newSongGenre);
                     }
 
                     if(!songNumber.equals(newSongNumber)) {
-                        MetaDataController.changeSongNumber(song, newSongNumber);
+                        MetaDataUtils.changeSongNumber(song, newSongNumber);
                     }
 
                     if(!recordingDate.equals(newRecordingDate)) {
-                        MetaDataController.changeRecordingDate(song, newRecordingDate);
+                        MetaDataUtils.changeRecordingDate(song, newRecordingDate);
                     }
 
                     if(mNewAlbumArtFile != null) {
-                        MetaDataController.changeAlbumArt(song, mNewAlbumArtFile);
+                        MetaDataUtils.changeAlbumArt(song, mNewAlbumArtFile);
 
                         mNewAlbumArtFile = null;
                     }
@@ -239,23 +251,23 @@ public class EditDialogBuilder {
                 try {
                     for (Content song : content) {
                         if(!newArtistName.equals("")) {
-                            MetaDataController.changeArtistName(song, newArtistName);
+                            MetaDataUtils.changeArtistName(song, newArtistName);
                         }
 
                         if(!newAlbumName.equals("")) {
-                            MetaDataController.changeAlbumName(song, newAlbumName);
+                            MetaDataUtils.changeAlbumName(song, newAlbumName);
                         }
 
                         if(!newSongGenre.equals("")) {
-                            MetaDataController.changeSongGenre(song, newSongGenre);
+                            MetaDataUtils.changeSongGenre(song, newSongGenre);
                         }
 
                         if(!newRecordingDate.equals("")) {
-                            MetaDataController.changeRecordingDate(song, newRecordingDate);
+                            MetaDataUtils.changeRecordingDate(song, newRecordingDate);
                         }
 
                         if (mNewAlbumArtFile != null) {
-                            MetaDataController.changeAlbumArt(song, mNewAlbumArtFile);
+                            MetaDataUtils.changeAlbumArt(song, mNewAlbumArtFile);
                         }
                     }
 

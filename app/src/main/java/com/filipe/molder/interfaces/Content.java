@@ -1,5 +1,7 @@
-package com.filipe.molder;
+package com.filipe.molder.interfaces;
 
+
+import com.filipe.molder.models.MetaData;
 
 import java.io.File;
 import java.util.List;

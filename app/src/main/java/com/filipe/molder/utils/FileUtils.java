@@ -1,8 +1,19 @@
-package com.filipe.molder;
+package com.filipe.molder.utils;
 
 
 import android.database.Cursor;
 import android.provider.MediaStore;
+
+import com.filipe.molder.interfaces.Content;
+import com.filipe.molder.adapters.ContentsListAdapter;
+import com.filipe.molder.exceptions.CouldNotRenameFolderException;
+import com.filipe.molder.models.Directory;
+import com.filipe.molder.exceptions.FileAlreadyExistsException;
+import com.filipe.molder.exceptions.FileCouldNotBeDeletedException;
+import com.filipe.molder.models.MetaData;
+import com.filipe.molder.adapters.NavigationBarAdapter;
+import com.filipe.molder.models.Song;
+import com.filipe.molder.activities.MainActivity;
 
 import org.apache.commons.io.FilenameUtils;
 
@@ -13,7 +24,7 @@ import java.util.List;
  * Handles tasks to do with the file system such as moving to
  * a specific directory, copying files, etc.
  */
-public class FileController {
+public class FileUtils {
 
     private static MainActivity mContext;
     private static ContentsListAdapter sContentsListAdapter;
@@ -29,7 +40,7 @@ public class FileController {
     }
 
     public static void setNavBarAdapter(NavigationBarAdapter navBarAdapter) {
-        FileController.sNavBarAdapter = navBarAdapter;
+        FileUtils.sNavBarAdapter = navBarAdapter;
     }
 
     public static void constructFileTree(File rootFileObject) {
@@ -248,7 +259,7 @@ public class FileController {
                 updateContents(content, oldFilePath, newFilePath);
             } else if(content instanceof Song) {
                 //Need to scan songs as to update their paths in the media store:
-                MetaDataController.scanSong(content);
+                MetaDataUtils.scanSong(content);
             }
         }
     }
