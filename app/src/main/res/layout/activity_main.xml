@@ -74,16 +74,28 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <ImageButton
-                android:id="@+id/imageButton2"
+                android:id="@+id/deleteButton"
                 android:layout_width="46dp"
                 android:layout_height="46dp"
                 android:layout_marginEnd="8dp"
                 android:layout_marginStart="8dp"
+                android:onClick="deleteButtonOnClick"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/imageButton3"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:srcCompat="@drawable/placeholder" />
+
+            <TextView
+                android:id="@+id/deleteButtonLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Delete"
+                android:textColor="@android:color/black"
+                app:layout_constraintBottom_toBottomOf="@+id/deleteButton"
+                app:layout_constraintEnd_toEndOf="@+id/deleteButton"
+                app:layout_constraintStart_toStartOf="@+id/deleteButton"
+                app:layout_constraintTop_toTopOf="@+id/deleteButton" />
 
             <ImageButton
                 android:id="@+id/imageButton3"
@@ -93,7 +105,7 @@
                 android:layout_marginStart="8dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/imageButton4"
-                app:layout_constraintStart_toEndOf="@+id/imageButton2"
+                app:layout_constraintStart_toEndOf="@+id/deleteButton"
                 app:layout_constraintTop_toTopOf="parent"
                 app:srcCompat="@drawable/placeholder"
                 tools:layout_editor_absoluteX="143dp" />

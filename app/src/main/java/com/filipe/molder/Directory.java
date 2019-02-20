@@ -30,6 +30,11 @@ public class Directory implements Content {
     }
 
     @Override
+    public void removeFile(Content file) {
+        mFiles.remove(file);
+    }
+
+    @Override
     public File getFile() {
         return mFile;
     }

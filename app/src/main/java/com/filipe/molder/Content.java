@@ -7,6 +7,7 @@ import java.util.List;
 public interface Content {
 
     void addFile(Content file);
+    void removeFile(Content file);
     void setIsSelected(boolean isSelected);
     File getFile();
     void setFile(File file);

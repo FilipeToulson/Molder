@@ -21,6 +21,11 @@ public class Song implements Content {
     }
 
     @Override
+    public void removeFile(Content file) {
+        //This method is not to be used by this class
+    }
+
+    @Override
     public void setIsSelected(boolean isSelected) {
         mIsSelected = isSelected;
     }

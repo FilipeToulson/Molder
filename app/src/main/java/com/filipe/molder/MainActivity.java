@@ -16,6 +16,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.File;
 import java.util.List;
@@ -117,6 +118,10 @@ public class MainActivity extends AppCompatActivity {
         mCurrentState.navBarOnClick(directory);
     }
 
+    public void deleteButtonOnClick(View view) {
+        mCurrentState.deleteButtonOnClick();
+    }
+
     public void editButtonOnClick(View view) {
         mCurrentState.editButtonOnClick();
     }
@@ -125,6 +130,10 @@ public class MainActivity extends AppCompatActivity {
         Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
         photoPickerIntent.setType("image/*");
         startActivityForResult(photoPickerIntent, PHOTO_PICKER_ACTIVITY_REQUEST_CODE);
+    }
+
+    public void removeContent(List<Content> contents) {
+        mContentsListAdapter.removeContent(contents);
     }
 
     public void refreshContentsList() {
@@ -152,11 +161,22 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void showEditDialog(EditCompleteListener editCompleteListener, List<Content> content,
-                               int dialogCode) {
+    public void showDeleteWarningDialog(DeleteCompleteListener deleteCompleteListener,
+                                        List<Content> content) {
+        AlertDialog.Builder deleteWarningDialog = DeleteWarningDialogBuilder.
+                buildDeleteWarningDialog(this, deleteCompleteListener, content);
+        deleteWarningDialog.show();
+    }
+
+    public void showEditDialog(EditCompleteListener editCompleteListener,
+                               List<Content> content, int dialogCode) {
         AlertDialog.Builder editDialog = EditDialogBuilder.buildEditDialog(this,
                 editCompleteListener, content, dialogCode);
         editDialog.show();
+    }
+
+    public void showErrorMessage(String message) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 
     public void setState(AppState newAppState) {

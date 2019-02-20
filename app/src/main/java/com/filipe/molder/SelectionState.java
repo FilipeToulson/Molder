@@ -9,12 +9,17 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SelectionState implements AppState, EditCompleteListener {
+public class SelectionState implements AppState, EditCompleteListener, DeleteCompleteListener {
 
     private static final int ONE_DIR_SELECTED = 0;
     private static final int ONE_SONG_SELECTED = 1;
     private static final int MULTIPLE_SONGS_SELECTED = 2;
     private int mNumberOfSongsSelected;
+    /*
+     * These are songs that had errors occur when their metadata was
+     * attempted to be read:
+     */
+    private int mNumberOfErrorBoundSongsSelected;
     private int mNumberOfDirsSelected;
     private List<Content> mSelectedContentList;
     private List<View> mSelectedViewsList;
@@ -22,6 +27,7 @@ public class SelectionState implements AppState, EditCompleteListener {
 
     public SelectionState(Content selectedContent, View view, MainActivity context) {
         mNumberOfSongsSelected = 0;
+        mNumberOfErrorBoundSongsSelected = 0;
         mNumberOfDirsSelected = 0;
 
         mSelectedContentList = new ArrayList<>();
@@ -41,7 +47,13 @@ public class SelectionState implements AppState, EditCompleteListener {
             mSelectedViewsList.remove(view);
 
             if (content instanceof Song) {
-                mNumberOfSongsSelected--;
+                MetaData metaData = content.getMetaData();
+
+                if(metaData.hasErrorOccurred()) {
+                    mNumberOfErrorBoundSongsSelected--;
+                } else {
+                    mNumberOfSongsSelected--;
+                }
             } else if (content instanceof Directory){
                 mNumberOfDirsSelected--;
             }
@@ -53,13 +65,20 @@ public class SelectionState implements AppState, EditCompleteListener {
             mSelectedViewsList.add(view);
 
             if (content instanceof Song) {
-                mNumberOfSongsSelected++;
+                MetaData metaData = content.getMetaData();
+
+                if(metaData.hasErrorOccurred()) {
+                    mNumberOfErrorBoundSongsSelected++;
+                } else {
+                    mNumberOfSongsSelected++;
+                }
             } else if (content instanceof Directory){
                 mNumberOfDirsSelected++;
             }
         }
 
-        if((mNumberOfSongsSelected == 0 && mNumberOfDirsSelected == 0) ||
+        if(mNumberOfErrorBoundSongsSelected > 0 ||
+                (mNumberOfSongsSelected == 0 && mNumberOfDirsSelected == 0) ||
                 (mNumberOfSongsSelected > 0 && mNumberOfDirsSelected > 0) ||
                 mNumberOfDirsSelected > 1) {
             mContext.enableEditButton(false);
@@ -77,9 +96,14 @@ public class SelectionState implements AppState, EditCompleteListener {
     public void navBarOnClick(File directory) {
         /*
          * This method is left blank on purpose as to not allow
-         * the user to go back to previous directories while in
-         * the selection state using the navigation bar.
+         * the user to go back to previous directories using the
+         * navigation bar while in the selection state.
          */
+    }
+
+    @Override
+    public void deleteButtonOnClick() {
+        mContext.showDeleteWarningDialog(this, mSelectedContentList);
     }
 
     @Override
@@ -102,7 +126,13 @@ public class SelectionState implements AppState, EditCompleteListener {
         mContext.showEditDialog(this, mSelectedContentList, dialogCode);
     }
 
-    //Called when the user sets the changes made from an edit dialog
+    @Override
+    public void deleteComplete() {
+        mContext.removeContent(mSelectedContentList);
+        exitSelectionState();
+        mContext.refreshContentsList();
+    }
+
     @Override
     public void editComplete() {
         exitSelectionState();

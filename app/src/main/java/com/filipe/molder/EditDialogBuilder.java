@@ -8,22 +8,16 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.v7.app.AlertDialog;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 
-import org.jaudiotagger.audio.exceptions.CannotReadException;
 import org.jaudiotagger.audio.exceptions.CannotWriteException;
-import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
 import org.jaudiotagger.tag.images.Artwork;
-import org.jaudiotagger.tag.images.ArtworkFactory;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
 
 public class EditDialogBuilder {
@@ -53,7 +47,7 @@ public class EditDialogBuilder {
     }
 
     private static AlertDialog.Builder buildDirEditDialog(final MainActivity context,
-                                                          List<Content> content) {
+                                                          final List<Content> content) {
         final Directory directory = (Directory)content.get(0);
         final File oldFile = directory.getFile();
         final String dirName = oldFile.getName();
@@ -76,11 +70,10 @@ public class EditDialogBuilder {
                 try {
                     FileController.changeDirectoryName(directory, newFileName);
                 } catch (FileAlreadyExistsException e) {
-                    Toast.makeText(context, "A folder with name \"" + newFileName +
-                            "\" already exists.", Toast.LENGTH_SHORT).show();
+                    context.showErrorMessage("A folder with name \"" + newFileName +
+                            "\" already exists.");
                 } catch (CouldNotRenameFolderException e) {
-                    Toast.makeText(context, "Could not rename folder.",
-                            Toast.LENGTH_SHORT).show();
+                    context.showErrorMessage("Could not rename folder.");
                 }
 
                 mEditCompleteListener.editComplete();
@@ -190,17 +183,13 @@ public class EditDialogBuilder {
 
                     mEditCompleteListener.editComplete();
                 } catch(CannotWriteException e) {
-                    Toast.makeText(context, "Can't change meta data.",
-                            Toast.LENGTH_SHORT).show();
+                    context.showErrorMessage("Can't change meta data.");
                 } catch (InvalidCharactersUsedException e) {
-                    Toast.makeText(context, "Invalid characters used for " + e.getMessage() + ".",
-                            Toast.LENGTH_SHORT).show();
+                    context.showErrorMessage("Invalid characters used for " + e.getMessage() + ".");
                 } catch (InvalidAlbumArtException e) {
-                    Toast.makeText(context, "Invalid file used for album art.",
-                            Toast.LENGTH_SHORT).show();
+                    context.showErrorMessage("Invalid file used for album art.");
                 } catch (CannotReadAlbumArtException e) {
-                    Toast.makeText(context, "Could not read image chosen for album art.",
-                            Toast.LENGTH_SHORT).show();
+                    context.showErrorMessage("Could not read image chosen for album art.");
                 }
             }
         });
@@ -273,17 +262,13 @@ public class EditDialogBuilder {
                     mNewAlbumArtFile = null;
                     mEditCompleteListener.editComplete();
                 } catch(CannotWriteException e) {
-                    Toast.makeText(context, "Can't change meta data.",
-                            Toast.LENGTH_SHORT).show();
+                    context.showErrorMessage("Can't change meta data.");
                 } catch (InvalidCharactersUsedException e) {
-                    Toast.makeText(context, "Invalid characters used for " + e.getMessage() + ".",
-                            Toast.LENGTH_SHORT).show();
+                    context.showErrorMessage("Invalid characters used for " + e.getMessage() + ".");
                 } catch (InvalidAlbumArtException e) {
-                    Toast.makeText(context, "Invalid file used for album art.",
-                            Toast.LENGTH_SHORT).show();
+                    context.showErrorMessage("Invalid file used for album art.");
                 } catch (CannotReadAlbumArtException e) {
-                    Toast.makeText(context, "Could not read image chosen for album art.",
-                            Toast.LENGTH_SHORT).show();
+                    context.showErrorMessage("Could not read image chosen for album art.");
                 }
             }
         });

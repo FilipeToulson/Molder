@@ -35,6 +35,10 @@ public class ContentsListAdapter extends RecyclerView.Adapter {
         refreshList();
     }
 
+    public void removeContent(List<Content> contents) {
+        mContentsList.removeAll(contents);
+    }
+
     public void refreshList() {
         notifyDataSetChanged();
     }

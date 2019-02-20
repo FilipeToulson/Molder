@@ -177,6 +177,36 @@ public class FileController {
         return atRootDir;
     }
 
+    public static void deleteFiles(Content parentDir, List<Content> contents)
+            throws FileCouldNotBeDeletedException {
+        for(Content content : contents)
+        {
+            File contentFile = content.getFile();
+
+            if(content instanceof Directory)
+            {
+                deleteFiles(content.getParentDir(), content.getFiles());
+            }
+
+            boolean deletingSuccessful = contentFile.delete();
+
+            if(deletingSuccessful) {
+                /*
+                 * Since this method could be first called from DeleteWarningDialogBuilder to only
+                 * delete songs, their parent directory can't be obtained. Instead files from the
+                 * top level of recursion are later removed from their parent directory's list of
+                 * contents from the ContentsListAdapter, as that is what holds the list of contents
+                 * that belong to the directory that the user is currently looking at.
+                 */
+                if(parentDir != null) {
+                    parentDir.removeFile(content);
+                }
+            } else {
+                throw new FileCouldNotBeDeletedException(contentFile.getName());
+            }
+        }
+    }
+
     public static void changeDirectoryName(Content directory, String newFileName)
             throws FileAlreadyExistsException, CouldNotRenameFolderException {
         File oldFile = directory.getFile();

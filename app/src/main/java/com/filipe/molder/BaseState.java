@@ -32,25 +32,20 @@ public class BaseState implements AppState {
 
     @Override
     public void contentOnLongClick(Content content, View view) {
-        MetaData metaData = content.getMetaData();
+        mContext.showControlsBar(true);
 
-        if(!content.getFile().isDirectory() && metaData.hasErrorOccurred()) {
-            //This is a song that had an error when metadata was attempted to be generated for it
-
-            Toast.makeText(mContext, metaData.getErrorMessage(), Toast.LENGTH_SHORT).show();
-        } else {
-            //This is a song or directory
-
-            mContext.showControlsBar(true);
-
-            AppState appState = new SelectionState(content, view, mContext);
-            mContext.setState(appState);
-        }
+        AppState appState = new SelectionState(content, view, mContext);
+        mContext.setState(appState);
     }
 
     @Override
     public void navBarOnClick(File directory) {
         FileController.moveBackToDir(directory);
+    }
+
+    @Override
+    public void deleteButtonOnClick() {
+        //This method is not to be used by this class
     }
 
     @Override
