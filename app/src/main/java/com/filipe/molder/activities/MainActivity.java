@@ -19,12 +19,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.filipe.molder.interfaces.AppState;
+import com.filipe.molder.interfaces.DirectorySelectedListener;
+import com.filipe.molder.interfaces.NavBarOnClickListener;
 import com.filipe.molder.utils.BaseState;
 import com.filipe.molder.interfaces.Content;
 import com.filipe.molder.adapters.ContentsListAdapter;
-import com.filipe.molder.interfaces.DeleteCompleteListener;
+import com.filipe.molder.interfaces.TaskCompleteListener;
 import com.filipe.molder.utils.DeleteWarningDialogBuilder;
-import com.filipe.molder.interfaces.EditCompleteListener;
 import com.filipe.molder.utils.EditDialogBuilder;
 import com.filipe.molder.utils.FileUtils;
 import com.filipe.molder.utils.MetaDataUtils;
@@ -35,12 +36,14 @@ import java.io.File;
 import java.util.List;
 
 //Takes care of handling the main UI.
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements NavBarOnClickListener {
 
     private static final int PERMISSIONS_ACTIVITY_REQUEST_CODE = 0;
     private static final int PHOTO_PICKER_ACTIVITY_REQUEST_CODE = 1;
+    private static final int DIR_SELECTOR_ACTIVITY_REQUEST_CODE = 2;
     private ContentsListAdapter mContentsListAdapter;
     private AppState mCurrentState;
+    private DirectorySelectedListener mDirectorySelectedListener;
     private ConstraintLayout mControlsBar;
     private int mControlsBarHeight;
 
@@ -79,6 +82,17 @@ public class MainActivity extends AppCompatActivity {
 
                     EditDialogBuilder.setNewAlbumArtFile(this, newAlbumArtUri);
                 }
+
+                break;
+            }case DIR_SELECTOR_ACTIVITY_REQUEST_CODE: {
+                if (resultCode == RESULT_OK) {
+                    String selectorTask = data.getStringExtra("selectorTask");
+                    File destinationFile = (File)data.getSerializableExtra("destinationFile");
+
+                    mDirectorySelectedListener.directorySelected(selectorTask, destinationFile);
+                }
+
+                break;
             }
         }
     }
@@ -127,12 +141,21 @@ public class MainActivity extends AppCompatActivity {
         mCurrentState.contentOnLongClick(content, view);
     }
 
+    @Override
     public void navBarOnClick(File directory) {
         mCurrentState.navBarOnClick(directory);
     }
 
     public void deleteButtonOnClick(View view) {
         mCurrentState.deleteButtonOnClick();
+    }
+
+    public void copyButtonOnClick(View view) {
+        mCurrentState.copyButtonOnClick();
+    }
+
+    public void moveButtonOnClick(View view) {
+        mCurrentState.moveButtonOnClick();
     }
 
     public void editButtonOnClick(View view) {
@@ -174,17 +197,25 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void showDeleteWarningDialog(DeleteCompleteListener deleteCompleteListener,
+    public void showDeleteWarningDialog(TaskCompleteListener taskCompleteListener,
                                         List<Content> content) {
         AlertDialog.Builder deleteWarningDialog = DeleteWarningDialogBuilder.
-                buildDeleteWarningDialog(this, deleteCompleteListener, content);
+                buildDeleteWarningDialog(this, taskCompleteListener, content);
         deleteWarningDialog.show();
     }
 
-    public void showEditDialog(EditCompleteListener editCompleteListener,
+    public void showDirectorySelectorActivity(String selectorTask,
+                                              DirectorySelectedListener directorySelectedListener) {
+        mDirectorySelectedListener = directorySelectedListener;
+        Intent directorySelectorIntent = new Intent(this, DirectorySelectorActivity.class);
+        directorySelectorIntent.putExtra("selectorTask", selectorTask);
+        startActivityForResult(directorySelectorIntent, DIR_SELECTOR_ACTIVITY_REQUEST_CODE);
+    }
+
+    public void showEditDialog(TaskCompleteListener taskCompleteListener,
                                List<Content> content, int dialogCode) {
         AlertDialog.Builder editDialog = EditDialogBuilder.buildEditDialog(this,
-                editCompleteListener, content, dialogCode);
+                taskCompleteListener, content, dialogCode);
         editDialog.show();
     }
 

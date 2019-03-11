@@ -7,15 +7,15 @@ import android.support.v7.app.AlertDialog;
 import com.filipe.molder.exceptions.FileCouldNotBeDeletedException;
 import com.filipe.molder.activities.MainActivity;
 import com.filipe.molder.interfaces.Content;
-import com.filipe.molder.interfaces.DeleteCompleteListener;
+import com.filipe.molder.interfaces.TaskCompleteListener;
 
 import java.util.List;
 
 public class DeleteWarningDialogBuilder {
 
     public static AlertDialog.Builder buildDeleteWarningDialog(final MainActivity context,
-                                                               final DeleteCompleteListener
-                                                                       deleteCompleteListener,
+                                                               final TaskCompleteListener
+                                                                       taskCompleteListener,
                                                                final List<Content> content) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
 
@@ -35,7 +35,7 @@ public class DeleteWarningDialogBuilder {
                     context.showErrorMessage("Could not delete " + e.getMessage() + ".");
                 }
 
-                deleteCompleteListener.deleteComplete();
+                taskCompleteListener.taskComplete(true, true);
             }
         });
         builder.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {

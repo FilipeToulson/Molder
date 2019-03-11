@@ -8,8 +8,8 @@ import android.view.View;
 import com.filipe.molder.activities.MainActivity;
 import com.filipe.molder.interfaces.AppState;
 import com.filipe.molder.interfaces.Content;
-import com.filipe.molder.interfaces.DeleteCompleteListener;
-import com.filipe.molder.interfaces.EditCompleteListener;
+import com.filipe.molder.interfaces.DirectorySelectedListener;
+import com.filipe.molder.interfaces.TaskCompleteListener;
 import com.filipe.molder.models.Directory;
 import com.filipe.molder.models.MetaData;
 import com.filipe.molder.models.Song;
@@ -18,7 +18,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SelectionState implements AppState, EditCompleteListener, DeleteCompleteListener {
+public class SelectionState implements AppState, TaskCompleteListener, DirectorySelectedListener {
 
     private static final int ONE_DIR_SELECTED = 0;
     private static final int ONE_SONG_SELECTED = 1;
@@ -116,6 +116,16 @@ public class SelectionState implements AppState, EditCompleteListener, DeleteCom
     }
 
     @Override
+    public void copyButtonOnClick() {
+        mContext.showDirectorySelectorActivity("Copy", this);
+    }
+
+    @Override
+    public void moveButtonOnClick() {
+        mContext.showDirectorySelectorActivity("Move", this);
+    }
+
+    @Override
     public void editButtonOnClick() {
         int dialogCode = ONE_DIR_SELECTED;
 
@@ -136,16 +146,29 @@ public class SelectionState implements AppState, EditCompleteListener, DeleteCom
     }
 
     @Override
-    public void deleteComplete() {
-        mContext.removeContent(mSelectedContentList);
-        exitSelectionState();
-        mContext.refreshContentsList();
+    public void directorySelected(String selectorTask, File destinationFile){
+        if(selectorTask.equals("Copy")) {
+            FileUtils.copyFiles(mSelectedContentList, destinationFile);
+
+            taskComplete(false, false);
+        } else if (selectorTask.equals("Move")) {
+            FileUtils.moveFiles(mSelectedContentList, destinationFile);
+
+            taskComplete(true, true);
+        }
     }
 
     @Override
-    public void editComplete() {
+    public void taskComplete(boolean removeContent, boolean refreshContents) {
+        if(removeContent) {
+            mContext.removeContent(mSelectedContentList);
+        }
+
         exitSelectionState();
-        mContext.refreshContentsList();
+
+        if(refreshContents) {
+            mContext.refreshContentsList();
+        }
     }
 
     @Override

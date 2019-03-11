@@ -54,6 +54,16 @@ public class BaseState implements AppState {
     }
 
     @Override
+    public void copyButtonOnClick() {
+        //This method is not to be used by this class
+    }
+
+    @Override
+    public void moveButtonOnClick() {
+        //This method is not to be used by this class
+    }
+
+    @Override
     public void editButtonOnClick() {
         //This method is not to be used by this class
     }
@@ -63,7 +73,7 @@ public class BaseState implements AppState {
         if (FileUtils.atRootDir()) {
             mContext.exitApp();
         } else {
-            FileUtils.moveBackDirOnce();
+            FileUtils.moveBackToPreviousDir();
         }
     }
 }

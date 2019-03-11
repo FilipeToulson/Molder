@@ -10,6 +10,8 @@ public interface AppState {
     void contentOnLongClick(Content content, View view);
     void navBarOnClick(File directory);
     void deleteButtonOnClick();
+    void copyButtonOnClick();
+    void moveButtonOnClick();
     void editButtonOnClick();
     void onBackPressed();
 }

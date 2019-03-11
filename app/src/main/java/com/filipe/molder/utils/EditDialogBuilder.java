@@ -16,8 +16,8 @@ import com.bumptech.glide.Glide;
 import com.filipe.molder.exceptions.CannotReadAlbumArtException;
 import com.filipe.molder.interfaces.Content;
 import com.filipe.molder.exceptions.CouldNotRenameFolderException;
+import com.filipe.molder.interfaces.TaskCompleteListener;
 import com.filipe.molder.models.Directory;
-import com.filipe.molder.interfaces.EditCompleteListener;
 import com.filipe.molder.exceptions.FileAlreadyExistsException;
 import com.filipe.molder.exceptions.InvalidAlbumArtException;
 import com.filipe.molder.exceptions.InvalidCharactersUsedException;
@@ -37,14 +37,14 @@ public class EditDialogBuilder {
     private static final int ONE_DIR_SELECTED = 0;
     private static final int ONE_SONG_SELECTED = 1;
     private static final int MULTIPLE_SONGS_SELECTED = 2;
-    private static EditCompleteListener mEditCompleteListener;
+    private static TaskCompleteListener mTaskCompleteListener;
     private static ImageView mEditAlbumArt;
     private static File mNewAlbumArtFile;
 
     public static AlertDialog.Builder buildEditDialog(MainActivity context,
-                                                      EditCompleteListener editCompleteListener,
+                                                      TaskCompleteListener taskCompleteListener,
                                                       List<Content> content, int dialogCode) {
-        mEditCompleteListener = editCompleteListener;
+        mTaskCompleteListener = taskCompleteListener;
         AlertDialog.Builder builder = null;
 
         if(dialogCode == ONE_DIR_SELECTED) {
@@ -88,7 +88,7 @@ public class EditDialogBuilder {
                     context.showErrorMessage("Could not rename folder.");
                 }
 
-                mEditCompleteListener.editComplete();
+                mTaskCompleteListener.taskComplete(false, true);
             }
         });
         builder.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
@@ -193,7 +193,7 @@ public class EditDialogBuilder {
                         mNewAlbumArtFile = null;
                     }
 
-                    mEditCompleteListener.editComplete();
+                    mTaskCompleteListener.taskComplete(false, true);
                 } catch(CannotWriteException e) {
                     context.showErrorMessage("Can't change meta data.");
                 } catch (InvalidCharactersUsedException e) {
@@ -272,7 +272,7 @@ public class EditDialogBuilder {
                     }
 
                     mNewAlbumArtFile = null;
-                    mEditCompleteListener.editComplete();
+                    mTaskCompleteListener.taskComplete(false, true);
                 } catch(CannotWriteException e) {
                     context.showErrorMessage("Can't change meta data.");
                 } catch (InvalidCharactersUsedException e) {

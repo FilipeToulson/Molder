@@ -81,7 +81,7 @@
                 android:layout_marginStart="8dp"
                 android:onClick="deleteButtonOnClick"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/imageButton3"
+                app:layout_constraintEnd_toStartOf="@+id/copyButton"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:srcCompat="@drawable/placeholder" />
@@ -98,31 +98,55 @@
                 app:layout_constraintTop_toTopOf="@+id/deleteButton" />
 
             <ImageButton
-                android:id="@+id/imageButton3"
+                android:id="@+id/copyButton"
                 android:layout_width="46dp"
                 android:layout_height="46dp"
                 android:layout_marginEnd="8dp"
                 android:layout_marginStart="8dp"
+                android:onClick="copyButtonOnClick"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/imageButton4"
+                app:layout_constraintEnd_toStartOf="@+id/moveButton"
                 app:layout_constraintStart_toEndOf="@+id/deleteButton"
                 app:layout_constraintTop_toTopOf="parent"
                 app:srcCompat="@drawable/placeholder"
                 tools:layout_editor_absoluteX="143dp" />
 
+            <TextView
+                android:id="@+id/copyButtonLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Copy"
+                android:textColor="@android:color/black"
+                app:layout_constraintBottom_toBottomOf="@+id/copyButton"
+                app:layout_constraintEnd_toEndOf="@+id/copyButton"
+                app:layout_constraintStart_toStartOf="@+id/copyButton"
+                app:layout_constraintTop_toTopOf="parent" />
+
             <ImageButton
-                android:id="@+id/imageButton4"
+                android:id="@+id/moveButton"
                 android:layout_width="46dp"
                 android:layout_height="46dp"
                 android:layout_marginEnd="8dp"
                 android:layout_marginStart="8dp"
+                android:onClick="moveButtonOnClick"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/editButton"
-                app:layout_constraintStart_toEndOf="@+id/imageButton3"
+                app:layout_constraintStart_toEndOf="@+id/copyButton"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintVertical_bias="0.0"
                 app:srcCompat="@drawable/placeholder"
                 tools:layout_editor_absoluteX="229dp" />
+
+            <TextView
+                android:id="@+id/moveButtonLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Move"
+                android:textColor="@android:color/black"
+                app:layout_constraintBottom_toBottomOf="@+id/moveButton"
+                app:layout_constraintEnd_toEndOf="@+id/moveButton"
+                app:layout_constraintStart_toStartOf="@+id/moveButton"
+                app:layout_constraintTop_toTopOf="@+id/moveButton" />
 
             <ImageButton
                 android:id="@+id/editButton"
@@ -133,7 +157,7 @@
                 android:onClick="editButtonOnClick"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/imageButton4"
+                app:layout_constraintStart_toEndOf="@+id/moveButton"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintVertical_bias="0.0"
                 app:srcCompat="@drawable/placeholder" />

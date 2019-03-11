@@ -8,7 +8,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.filipe.molder.R;
-import com.filipe.molder.activities.MainActivity;
+import com.filipe.molder.interfaces.NavBarOnClickListener;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -17,11 +17,11 @@ import java.util.List;
 public class NavigationBarAdapter extends RecyclerView.Adapter {
 
     private List<File> mDirsList;
-    private MainActivity mContext;
+    private NavBarOnClickListener mNavBarOnClickListener;
 
-    public NavigationBarAdapter(MainActivity context) {
+    public NavigationBarAdapter(NavBarOnClickListener navBarOnClickListener) {
         mDirsList = new ArrayList<>();
-        mContext = context;
+        mNavBarOnClickListener = navBarOnClickListener;
     }
 
     @Override
@@ -46,9 +46,19 @@ public class NavigationBarAdapter extends RecyclerView.Adapter {
         notifyDataSetChanged();
     }
 
+    public void removeDir(int index) {
+        mDirsList.remove(index);
+        notifyDataSetChanged();
+    }
+
     @Override
     public int getItemCount() {
         return mDirsList.size();
+    }
+
+    public File getCurrentDir() {
+        int currentDirIndex = mDirsList.size() - 1;
+        return mDirsList.get(currentDirIndex);
     }
 
     private class NavBarViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
@@ -72,7 +82,7 @@ public class NavigationBarAdapter extends RecyclerView.Adapter {
 
         @Override
         public void onClick(View view) {
-            mContext.navBarOnClick(mDir);
+            mNavBarOnClickListener.navBarOnClick(mDir);
         }
     }
 }

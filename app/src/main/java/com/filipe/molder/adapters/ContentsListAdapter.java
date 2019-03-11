@@ -117,7 +117,7 @@ public class ContentsListAdapter extends RecyclerView.Adapter {
                 public void run() {
                     mName.setText(fileName);
                     mFooter.setText(numberOfItems);
-                    mContentImageView.setImageResource(R.drawable.placeholder);
+                    Glide.with(mContext).load(R.drawable.placeholder).into(mContentImageView);
                 }
             });
         }

@@ -18,6 +18,8 @@ import com.filipe.molder.activities.MainActivity;
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /*
@@ -26,13 +28,14 @@ import java.util.List;
  */
 public class FileUtils {
 
-    private static MainActivity mContext;
+    private static MainActivity sContext;
     private static ContentsListAdapter sContentsListAdapter;
     private static NavigationBarAdapter sNavBarAdapter;
-    private static Content currentDir;
+    private static Content sRootDir;
+    private static Content sCurrentDir;
 
     public static void setContext(MainActivity context) {
-        mContext = context;
+        sContext = context;
     }
 
     public static void setContentsListAdapter(ContentsListAdapter contentsListAdapter) {
@@ -43,12 +46,17 @@ public class FileUtils {
         FileUtils.sNavBarAdapter = navBarAdapter;
     }
 
-    public static void constructFileTree(File rootFileObject) {
-        Content rootDir = new Directory(rootFileObject, null);
+    public static Content getRootDir() {
+        return sRootDir;
+    }
 
-        addContentsToDir(rootDir, rootFileObject);
-        rootDir.getFiles().sort(new ContentComparator());
-        moveToDirectory(rootDir, true);
+    public static void constructFileTree(File rootFileObject) {
+        sRootDir = new Directory(rootFileObject, null);
+
+        addContentsToDir(sRootDir, rootFileObject);
+        addSongsToDir(sRootDir, rootFileObject);
+        sRootDir.getFiles().sort(new ContentComparator());
+        moveToDirectory(sRootDir, true);
     }
 
     //Adds directories and songs to a specific directory
@@ -94,6 +102,20 @@ public class FileUtils {
         return containsSongs;
     }
 
+    public static List<File> getDirectories(File directory) {
+        File[] files = directory.listFiles();
+        Arrays.sort(files);
+        List<File> directories = new ArrayList<>();
+
+        for(File file : files) {
+            if(file.isDirectory() && !file.isHidden()) {
+                directories.add(file);
+            }
+        }
+
+        return directories;
+    }
+
     private static void addSongsToDir(Content dir, File driFileObject) {
         /*
          * Here the Media Store is used in order to retrieve cached meta data in order
@@ -110,7 +132,7 @@ public class FileUtils {
                 "%" + dirFilePath + "/%",
                 "%" + dirFilePath + "/%/%"
         };
-        Cursor cursor = mContext.getContentResolver().query(
+        Cursor cursor = sContext.getContentResolver().query(
                 MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, null, selection,
                 selectionArgs, null);
 
@@ -150,31 +172,31 @@ public class FileUtils {
             sNavBarAdapter.addDir(dir.getFile());
         }
 
-        currentDir = dir;
+        sCurrentDir = dir;
         sContentsListAdapter.setContentsList(dir.getFiles());
     }
 
-    public static void moveBackDirOnce() {
-        sNavBarAdapter.removeDir(currentDir.getFile());
-        moveToDirectory(currentDir.getParentDir(), false);
+    public static void moveBackToPreviousDir() {
+        sNavBarAdapter.removeDir(sCurrentDir.getFile());
+        moveToDirectory(sCurrentDir.getParentDir(), false);
     }
 
     public static void moveBackToDir(File targetDir) {
         boolean done = false;
-        File currentDirFileObject = currentDir.getFile();
+        File currentDirFileObject = sCurrentDir.getFile();
 
         if(!currentDirFileObject.equals(targetDir)) {
             while (!done && sNavBarAdapter.getItemCount() > 0) {
-                if (targetDir.getPath().equals(currentDir.getFile().getPath())) {
+                if (targetDir.getPath().equals(sCurrentDir.getFile().getPath())) {
                     done = true;
                 } else {
                     sNavBarAdapter.removeDir(currentDirFileObject);
-                    currentDir = currentDir.getParentDir();
-                    currentDirFileObject = currentDir.getFile();
+                    sCurrentDir = sCurrentDir.getParentDir();
+                    currentDirFileObject = sCurrentDir.getFile();
                 }
             }
 
-            moveToDirectory(currentDir, false);
+            moveToDirectory(sCurrentDir, false);
         }
     }
 
@@ -212,10 +234,23 @@ public class FileUtils {
                 if(parentDir != null) {
                     parentDir.removeFile(content);
                 }
+
+                //The media store must be updated to remove a song's entry in the data base:
+                if(content instanceof Song) {
+                    MetaDataUtils.scanSong(content);
+                }
             } else {
                 throw new FileCouldNotBeDeletedException(contentFile.getName());
             }
         }
+    }
+
+    public static void copyFiles(List<Content> contents, File destinationFile) {
+        //TODO: implement file copying
+    }
+
+    public static void moveFiles(List<Content> contents, File destinationFile) {
+        //TODO: implement file moving
     }
 
     public static void changeDirectoryName(Content directory, String newFileName)
